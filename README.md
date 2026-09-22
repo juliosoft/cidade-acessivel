@@ -1,4 +1,4 @@
-# Cidade Acessível 2D — versão 3
+# Cidade Acessível 2D — versão 3.1
 
 Jogo educativo para projeto escolar. Informe apenas um nickname, escolha um personagem e percorra três fases. Não há senha, cadastro de conta ou banco SQL.
 
@@ -128,6 +128,14 @@ npm test
 npm run build
 ```
 
-Os testes verificam regras, escolha única sem pré-seleção, física, fases ignoradas, persistência real em arquivos temporários, concorrência, idempotência, histórico, ranking e o contrato do adaptador Blob com SDK simulado. A validação visual em navegador/celulares reais permanece pendente; o ambiente não conseguiu disponibilizar o navegador de testes. O teste do Blob não usa credenciais nem comprova a configuração do armazenamento online; valide essa integração depois de conectá-lo na Vercel. A API não disponibiliza operações para apagar resultados.
+Os testes verificam regras, escolha única sem pré-seleção, física, fases ignoradas, persistência real em arquivos temporários, concorrência, idempotência, histórico, ranking e o contrato do adaptador Blob com SDK simulado. O layout foi conferido em Chromium com telas touch emuladas de 844×390, 667×375, 568×320 e 1024×768, incluindo rotação, diálogos e fallback. A conferência em aparelhos físicos, especialmente Safari/iPhone, permanece necessária. O teste do Blob não usa credenciais nem comprova a configuração do armazenamento online; valide essa integração depois de conectá-lo na Vercel. A API não disponibiliza operações para apagar resultados.
 
 Fontes: [SDK Vercel Blob](https://vercel.com/docs/vercel-blob/using-blob-sdk), [Node.js Functions](https://vercel.com/docs/functions/runtimes/node-js).
+
+## Ajuste mobile — versão 3.1
+
+No celular em horizontal, o jogo se ajusta automaticamente à área visível, sem cabeçalho ou rodapé. O botão **⛶ Tela cheia**, no canto superior do jogo, pede tela cheia ao navegador. **⤢ Reduzir** sai do modo expandido. O cenário mantém a proporção 16:9: pequenas faixas livres são normais em telas mais largas.
+
+Quando a tela cheia nativa não está disponível (incluindo algumas versões do Safari/iPhone), o botão usa a área disponível da página e mantém apenas o jogo e controles. As barras do navegador podem permanecer. Rotação e mudanças nas barras recalculam o espaço disponível; os desafios continuam acessíveis em tela cheia.
+
+Para atualizar uma instalação existente, substitua apenas `public/index.html`, `public/style.css` e `public/game.js` e recarregue a página. Não substitua sua pasta `data` nem `.env.local`. No deploy, publique novamente o projeto.

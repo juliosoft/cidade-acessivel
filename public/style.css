@@ -510,67 +510,6 @@ button,
 input {
   touch-action: manipulation;
 }
-@media (pointer: coarse) and (orientation: landscape) and (max-height: 600px) {
-  body.playing {
-    overflow: hidden;
-  }
-  .playing .shell {
-    padding: 0;
-    max-width: none;
-  }
-  .playing header,
-  .playing footer,
-  .playing .game-title,
-  .playing .help,
-  .playing .below,
-  .playing #live {
-    display: none;
-  }
-  .playing .stage {
-    height: 100dvh;
-    width: min(100vw, 177.7778dvh);
-    margin: auto;
-    border: 0;
-    border-radius: 0;
-  }
-  .playing #game {
-    height: 100%;
-    width: 100%;
-  }
-  .playing .controls {
-    position: fixed;
-    bottom: max(10px, env(safe-area-inset-bottom));
-    left: max(12px, env(safe-area-inset-left));
-    right: max(12px, env(safe-area-inset-right));
-    z-index: 3;
-    pointer-events: none;
-  }
-  .playing .controls button {
-    pointer-events: auto;
-    opacity: 0.92;
-    min-height: 54px;
-  }
-  .playing .hud {
-    padding-left: max(8px, env(safe-area-inset-left));
-    padding-right: max(8px, env(safe-area-inset-right));
-  }
-  dialog {
-    max-height: 94dvh;
-    padding: 18px;
-  }
-  dialog h2 {
-    font-size: 22px;
-  }
-  dialog p {
-    margin: 9px 0;
-  }
-  .choice {
-    padding: 8px;
-  }
-  .options {
-    gap: 6px;
-  }
-}
 
 #rotate {
   margin: 0;
@@ -583,4 +522,125 @@ input {
 }
 #rotate::backdrop {
   background: #0b2026;
+}
+
+/* O cenário sempre cabe inteiro: preserva 16:9, sem esticar nem cortar. */
+body.game-expanded {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.game-expanded header,
+.game-expanded footer,
+.game-expanded .game-title,
+.game-expanded .below,
+.game-expanded #game-help {
+  display: none;
+}
+.game-expanded #screen-game {
+  position: fixed;
+  z-index: 20;
+  left: var(--view-left, 0px);
+  top: var(--view-top, 0px);
+  width: var(--view-width, 100vw);
+  height: var(--view-height, 100dvh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: #07171c;
+  overflow: hidden;
+}
+.game-expanded .stage {
+  width: 100%;
+  max-width: calc(
+    (
+        var(--view-height, 100dvh) - env(safe-area-inset-top) -
+          env(safe-area-inset-bottom)
+      ) *
+      16 / 9
+  );
+  height: auto;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+}
+.game-expanded #game {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+.game-expanded .controls {
+  position: absolute;
+  z-index: 3;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  left: max(10px, env(safe-area-inset-left));
+  right: max(10px, env(safe-area-inset-right));
+  pointer-events: none;
+}
+.game-expanded .controls button {
+  pointer-events: auto;
+  min-width: 58px;
+  min-height: 50px;
+  padding: 8px 14px;
+  opacity: 0.9;
+}
+.game-expanded #live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.game-expanded .hud {
+  gap: 8px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.game-expanded .hud .nickname {
+  display: none;
+}
+.game-expanded .tools button {
+  min-height: 40px;
+  padding: 6px 8px;
+}
+html:fullscreen,
+html:-webkit-full-screen {
+  background: #07171c;
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  dialog {
+    max-height: calc(var(--view-height, 100dvh) - 16px);
+    padding: 16px;
+  }
+  dialog h2 {
+    font-size: 21px;
+    margin: 3px 0 8px;
+  }
+  dialog p {
+    margin: 8px 0;
+  }
+  .choice {
+    padding: 8px;
+  }
+  .options {
+    gap: 6px;
+  }
+}
+@media (max-width: 620px) {
+  .game-expanded .hud {
+    gap: 5px;
+    font-size: 10px;
+  }
+  .game-expanded .tools button {
+    padding: 5px;
+    font-size: 11px;
+  }
+  .game-expanded .controls button {
+    min-width: 48px;
+    min-height: 44px;
+    padding: 6px 10px;
+  }
 }

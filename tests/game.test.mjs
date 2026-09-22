@@ -9,6 +9,7 @@ class El {
     this.dataset = {};
     this.classList = { add() {}, remove() {}, toggle() {} };
     this.value = "";
+    this.style = { setProperty() {} };
   }
   append(...x) {
     this.children.push(...x);
@@ -38,6 +39,8 @@ function setup() {
   );
   const context = {
     console,
+    innerWidth: 800,
+    innerHeight: 450,
     URL,
     AbortSignal,
     setTimeout,
@@ -52,6 +55,7 @@ function setup() {
     Error,
     document: {
       hidden: false,
+      documentElement: new El(),
       body: new El(),
       querySelector: $,
       querySelectorAll: (s) =>
@@ -118,4 +122,23 @@ test("Moving and jumping land on the raised platforms", () => {
     "player.x=380;player.y=260;player.vy=200;for(let i=0;i<30;i++)update(.016);",
   );
   assert.equal(run("player.y"), 290);
+});
+
+test("Fullscreen indisponível usa modo expandido e permite sair", async () => {
+  const { run } = setup();
+  run("state='game';loadLevel();");
+  await run("$('#fullscreen').onclick()");
+  assert.equal(run("manualView"), true);
+  assert.equal(run("$('#fullscreen').textContent"), "⤢ Reduzir");
+  await run("$('#fullscreen').onclick()");
+  assert.equal(run("manualView"), false);
+});
+test("Fullscreen recusado mantém fallback sem interromper o jogo", async () => {
+  const { run } = setup();
+  run(
+    "state='game';loadLevel();document.documentElement.requestFullscreen=async()=>{throw Error('Unsupported')};",
+  );
+  await run("$('#fullscreen').onclick()");
+  assert.equal(run("manualView"), true);
+  assert.equal(run("state"), "game");
 });

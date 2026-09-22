@@ -180,10 +180,17 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 function say(t) {
   $("#live").textContent = t;
 }
+let manualView = null;
+let ownedFullscreen = false;
 function showScreen(name) {
   state = name;
   document.body.classList.toggle("playing", name === "game");
   $$(".screen").forEach((e) => (e.hidden = e.id !== "screen-" + name));
+  if (name !== "game") {
+    manualView = null;
+    leaveNativeFullscreen();
+  }
+  syncGameView();
 }
 function clearInput() {
   input.left.clear();
@@ -1138,6 +1145,82 @@ $$(".avatar canvas").forEach((c, i) => {
     i === 1 ? "#865338" : i === 2 ? "#d8a17d" : "#b57b55",
   );
 });
+// Fullscreen no elemento raiz mantém desafios e avisos dentro da tela cheia.
+function nativeFullscreen() {
+  return document.fullscreenElement || document.webkitFullscreenElement;
+}
+function syncGameView() {
+  const view = window.visualViewport;
+  const root = document.documentElement;
+  const width = view?.width || window.innerWidth;
+  const height = view?.height || window.innerHeight;
+  root.style.setProperty("--view-width", width + "px");
+  root.style.setProperty("--view-height", height + "px");
+  root.style.setProperty("--view-left", (view?.offsetLeft || 0) + "px");
+  root.style.setProperty("--view-top", (view?.offsetTop || 0) + "px");
+  const mobileLandscape = matchMedia(
+    "(any-pointer: coarse) and (orientation: landscape)",
+  ).matches;
+  const expanded =
+    state === "game" &&
+    (!!nativeFullscreen() || (manualView ?? mobileLandscape));
+  document.body.classList.toggle("game-expanded", expanded);
+  const active = !!nativeFullscreen() || manualView === true;
+  $("#fullscreen").textContent = active ? "⤢ Reduzir" : "⛶ Tela cheia";
+  $("#fullscreen").setAttribute("aria-pressed", String(active));
+  $("#fullscreen").title = active
+    ? "Sair do modo expandido"
+    : "Mostrar somente o jogo em tela cheia";
+}
+async function leaveNativeFullscreen() {
+  if (!ownedFullscreen || !nativeFullscreen()) return;
+  try {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    if (exit) await exit.call(document);
+  } catch {
+  } finally {
+    ownedFullscreen = false;
+  }
+}
+$("#fullscreen").onclick = async () => {
+  clearInput();
+  if (nativeFullscreen() || manualView === true) {
+    manualView = false;
+    await leaveNativeFullscreen();
+  } else {
+    manualView = true;
+    syncGameView();
+    const root = document.documentElement;
+    const request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (request) {
+      try {
+        await request.call(root);
+        ownedFullscreen = true;
+      } catch {
+        say(
+          "Modo expandido ativado. As barras do navegador podem permanecer visíveis.",
+        );
+      }
+    } else {
+      say(
+        "Modo expandido ativado. As barras do navegador podem permanecer visíveis.",
+      );
+    }
+  }
+  syncGameView();
+  if (state === "game" && !modal) canvas.focus({ preventScroll: true });
+};
+function fullscreenChanged() {
+  if (!nativeFullscreen() && ownedFullscreen) {
+    ownedFullscreen = false;
+    manualView = false;
+  }
+  syncGameView();
+}
+document.addEventListener("fullscreenchange", fullscreenChanged);
+document.addEventListener("webkitfullscreenchange", fullscreenChanged);
+window.visualViewport?.addEventListener("resize", syncGameView);
+window.visualViewport?.addEventListener("scroll", syncGameView);
 function checkOrientation() {
   const was = portrait;
   portrait = matchMedia(
@@ -1148,6 +1231,7 @@ function checkOrientation() {
   if (portrait && !overlay.open) overlay.showModal();
   if (!portrait && overlay.open) overlay.close();
   if (portrait && !was) clearInput();
+  syncGameView();
 }
 addEventListener("resize", checkOrientation);
 addEventListener("orientationchange", checkOrientation);
