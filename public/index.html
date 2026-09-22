@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#102b31" />
+    <title>Cidade Acessível 2D</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div class="brand"><b>CA</b> Cidade Acessível <small>2D</small></div>
+        <span class="tag">Uma cidade para todas as pessoas</span>
+      </header>
+      <section id="screen-login" class="screen">
+        <div class="card intro">
+          <div class="copy">
+            <span class="eyebrow">Explore · Aprenda · Transforme</span>
+            <h1>Pequenas ações.<br />Uma cidade<br />para todos.</h1>
+            <p>
+              Percorra três bairros, encontre barreiras e ajude a construir uma
+              cidade mais acessível.
+            </p>
+            <form id="login-form" novalidate>
+              <label for="player-nickname">Como podemos chamar você?</label
+              ><input
+                id="player-nickname"
+                maxlength="12"
+                minlength="3"
+                required
+                autocomplete="nickname"
+                placeholder="Seu nickname"
+                aria-describedby="nickname-help login-error"
+              /><small id="nickname-help"
+                >De 3 a 12 letras, números, hífen ou sublinhado.</small
+              >
+              <p class="help">
+                Sem cadastro e sem senha. Use o mesmo nickname para consultar
+                seu histórico.
+              </p>
+              <div id="login-error" class="error" role="alert"></div>
+              <div class="row">
+                <button id="btn-start" class="primary" type="submit">
+                  Continuar →</button
+                ><button id="btn-ranking" type="button">Ver ranking</button>
+              </div>
+            </form>
+          </div>
+          <div class="art">
+            <canvas
+              id="cover"
+              width="400"
+              height="400"
+              aria-label="Ilustração em pixel art de uma rua com rampa, árvores e pessoas"
+            ></canvas
+            ><span class="art-caption"
+              >3 FASES &nbsp; / &nbsp; 6 TRANSFORMAÇÕES</span
+            >
+          </div>
+        </div>
+        <div class="steps">
+          <span><strong>01</strong> Rua comercial · Acesso físico</span
+          ><span><strong>02</strong> Avenida · Acesso sensorial</span
+          ><span><strong>03</strong> Escola · Inclusão</span>
+        </div>
+      </section>
+      <section id="screen-avatar" class="screen card center" hidden>
+        <span class="eyebrow">Seu lugar na cidade</span>
+        <h2>Escolha quem vai explorar</h2>
+        <p>Todos os personagens têm as mesmas habilidades.</p>
+        <div class="avatars">
+          <button class="avatar" data-avatar="0" aria-pressed="true">
+            <canvas width="60" height="70" aria-hidden="true"></canvas>Alex ·
+            Verde</button
+          ><button class="avatar" data-avatar="1" aria-pressed="false">
+            <canvas width="60" height="70" aria-hidden="true"></canvas>Bia ·
+            Azul</button
+          ><button class="avatar" data-avatar="2" aria-pressed="false">
+            <canvas width="60" height="70" aria-hidden="true"></canvas>Cris ·
+            Laranja
+          </button>
+        </div>
+        <div class="row" style="justify-content: center">
+          <button id="history-button">Meu histórico</button
+          ><button id="logout">Trocar nickname</button>
+        </div>
+        <p id="account-status" role="status"></p>
+        <button id="play" class="primary">Iniciar jogo →</button>
+        <p class="help">
+          A/D ou ←/→: mover · Espaço/W: pular · E/Enter: ação<br />No celular,
+          use os botões abaixo do cenário.
+        </p>
+      </section>
+      <section id="screen-game" class="screen" hidden>
+        <div class="game-title">
+          <div>
+            <span id="phase-theme" class="eyebrow"></span>
+            <h2 id="phase-title"></h2>
+          </div>
+          <p id="progress">0/2 barreiras · 0/10 itens</p>
+        </div>
+        <div class="stage">
+          <canvas
+            id="game"
+            width="800"
+            height="450"
+            tabindex="0"
+            aria-label="Jogo de plataforma Cidade Acessível. Use as instruções abaixo."
+            aria-describedby="game-help"
+            >Seu navegador precisa oferecer suporte ao Canvas.</canvas
+          >
+          <div class="hud">
+            <span class="nickname" id="hud-name"></span
+            ><span>PONTOS <strong id="hud-score">0</strong></span
+            ><span>FASE <strong id="hud-level">1/3</strong></span
+            ><span id="hud-time">0:00</span>
+            <div class="tools">
+              <button id="sound" aria-pressed="false" title="Ativar som">
+                ♪ Som off</button
+              ><button
+                id="contrast"
+                aria-pressed="false"
+                title="Alternar alto contraste"
+              >
+                ◐ Contraste</button
+              ><button id="pause" title="Pausar jogo">Ⅱ</button>
+            </div>
+          </div>
+        </div>
+        <div class="below">
+          <p id="objective">Explore a rua e aproxime-se das pessoas.</p>
+          <span id="distance"></span>
+        </div>
+        <div class="controls" aria-label="Controles do jogo">
+          <div>
+            <button id="left" aria-label="Mover para a esquerda">◀</button
+            ><button id="right" aria-label="Mover para a direita">▶</button>
+          </div>
+          <div>
+            <button id="jump">PULAR</button
+            ><button id="action" class="primary">AÇÃO</button>
+          </div>
+        </div>
+        <p id="game-help" class="help">
+          A/D ou setas: mover · Espaço/W: pular · E/Enter: interagir · Esc:
+          pausar. Você pode concluir a fase com ações pendentes (zero ponto).
+          Uma resposta por obstáculo. O tempo inclui as decisões e pausa apenas
+          em pausas, abas ocultas ou orientação vertical.
+        </p>
+        <div id="live" class="status" role="status" aria-live="polite"></div>
+      </section>
+      <section id="screen-final" class="screen card center" hidden>
+        <span class="eyebrow">Missão cumprida</span>
+        <h1>Uma cidade melhor.<br />Uma conquista sua.</h1>
+        <p id="final-message"></p>
+        <div id="metrics" class="results"></div>
+        <p id="score-formula"></p>
+        <p id="save-status" role="status"></p>
+        <div id="phase-summary"></div>
+        <button id="final-history">Meu histórico</button>
+        <h2>Top 10 · Ranking global</h2>
+        <div id="final-ranking"></div>
+        <div class="row" style="justify-content: center">
+          <button id="replay" class="primary">Jogar novamente</button
+          ><button id="home">Escolher avatar</button>
+        </div>
+      </section>
+      <footer>
+        <span>Feito para incluir. Jogue para transformar.</span
+        ><span id="storage-label">Carregando ambiente…</span>
+      </footer>
+    </main>
+    <dialog id="challenge" aria-labelledby="challenge-title">
+      <span class="eyebrow">Transforme este lugar</span>
+      <h2 id="challenge-title"></h2>
+      <p id="challenge-desc"></p>
+      <fieldset
+        id="options"
+        class="options"
+        aria-label="Escolha uma alternativa"
+      ></fieldset>
+      <button id="confirm-choice" class="primary" disabled>
+        Confirmar resposta
+      </button>
+      <p id="feedback" class="feedback" role="status"></p>
+      <button id="challenge-close">Voltar à cidade</button>
+    </dialog>
+    <dialog id="ranking" aria-labelledby="ranking-title">
+      <h2 id="ranking-title">Placar de líderes</h2>
+      <p>Maiores pontuações. Em caso de empate, vence o menor tempo total.</p>
+      <div id="ranking-table"></div>
+      <div class="row">
+        <button id="ranking-close" class="primary">Fechar</button>
+      </div>
+    </dialog>
+    <dialog id="pause-dialog" aria-labelledby="pause-title">
+      <h2 id="pause-title">Uma pausa na cidade</h2>
+      <p>Seu tempo está pausado. Continue quando quiser.</p>
+      <button id="resume" class="primary">Continuar</button>
+    </dialog>
+    <dialog id="transition" aria-labelledby="transition-title">
+      <span class="eyebrow">Bairro transformado</span>
+      <h2 id="transition-title"></h2>
+      <p id="transition-text"></p>
+      <button id="next-level" class="primary">Registrar e continuar →</button>
+      <p id="phase-save-status" role="status"></p>
+    </dialog>
+    <dialog id="history-dialog" aria-labelledby="history-title">
+      <h2 id="history-title">Meu histórico</h2>
+      <p>
+        Últimas 50 partidas deste nickname. Não há senha: qualquer pessoa pode
+        usar o mesmo nome.
+      </p>
+      <div id="history-list"></div>
+      <button id="history-close">Fechar</button>
+    </dialog>
+    <dialog id="rotate" aria-labelledby="rotate-title" hidden>
+      <div>
+        <span style="font-size: 54px">↻</span>
+        <h2 id="rotate-title">Vire o celular na horizontal</h2>
+        <p>
+          Assim você vê o cenário e alcança os controles.<br />A partida está
+          pausada enquanto você gira a tela.
+        </p>
+      </div>
+    </dialog>
+    <script src="/game.js" defer></script>
+  </body>
+</html>
